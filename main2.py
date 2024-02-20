@@ -4,8 +4,10 @@ import pyautogui
 from functools import partial
 from pathlib import Path
 
-global x 
+teleport_active = False 
 x = 1400
+new_x_after_teleport = x
+
 cycle = 0
 check = 1
 idle_num = [1, 2, 3, 4, 5, 8]
@@ -28,7 +30,19 @@ def gif_work(cycle, frames, event_number, first_num, last_num):
    
 # Update to gif
 def update(cycle, check, event_number, x, x_left_edge, x_right_edge):
-    global frame
+    global frame 
+    global teleport_active
+    global new_x_after_teleport
+    
+    if teleport_active:
+        #start teleporter animation
+        frame = tele_start_frames[cycle]
+        cycle, event_number = gif_work(cycle, tele_start_frames, event_number, 1, 3)
+        
+        x = new_x_after_teleport
+        teleport_active = False
+        print("The teleport was active!")
+
     y = (screen_height - window.winfo_reqheight())
 
     if check == 0:
@@ -43,8 +57,8 @@ def update(cycle, check, event_number, x, x_left_edge, x_right_edge):
         cycle, event_number = gif_work(cycle, walk_right_frames, event_number, 1, 3)
         x += 50
     elif check == 11:
-        frame = walk_right_frames[cycle]
-        cycle, event_number = gif_work(cycle, walk_right_frames, event_number, 1, 3)
+        frame = tele_start_frames[cycle]
+        cycle, event_number = gif_work(cycle, tele_start_frames, event_number, 1, 3)
         x += 100
     else:
         event_number = random.randrange(1, 11, 1)
@@ -58,7 +72,6 @@ def update(cycle, check, event_number, x, x_left_edge, x_right_edge):
 
 def event(cycle, check, event_number, x, x_left_edge, x_right_edge):
     
-
     if event_number in idle_num:
         check = 0
         print('idle')
@@ -89,24 +102,33 @@ window.geometry(f'{window.winfo_reqwidth()}x{window.winfo_reqheight()}+{x_coordi
 print(window.winfo_screenwidth())
 print("starting")
 
-
-
 # Calculate the x-coordinate for screen edges
 x_left_edge = (screen_width - window.winfo_reqwidth()) // 2
 x_right_edge = x_left_edge + screen_width
 
+def generate_x_coordinate(window, exclusion_range=200):
+    while True:
+        number = random.randint(-200, screen_width)
+        if not (window.winfo_x() - 200 <= number <= window.winfo_x() + 200):
+            return number
 
-def onclick_teleport(event):
+def onclick_teleport(Event):
     global x
-    x = window.winfo_x()
-    # event_number = 11
-    print("pressed")
-    if event.widget == window:
-        print("fake")
+    global frame
+    global teleport_active
+    global new_x_after_teleport
+    cycle = 0
+    event_number = 11
 
-    x += 200
+    
+    x = window.winfo_x()
+    new_x_after_teleport = generate_x_coordinate(window) #x + 200
+    teleport_active = True
+
+
+    
     window.geometry(f'+{x}+{(screen_height - window.winfo_reqheight())}')
-    # window.after(1, update, cycle, check, event_number, x, x_left_edge, x_right_edge)
+   
 
 
     
@@ -117,7 +139,7 @@ window.bind("<Button-1>", onclick_teleport)
 idle_frames = [tk.PhotoImage(file=impath + '001_idle.gif', format='gif -index %i' % (i)) for i in range(1)]
 walk_right_frames = [tk.PhotoImage(file=impath + '002_walkright.gif', format='gif -index %i' % (i)) for i in range(1)]
 walk_left_frames = [tk.PhotoImage(file=impath + '003_walkleft.gif', format='gif -index %i' % (i)) for i in range(1)]
-
+tele_start_frames = [tk.PhotoImage(file=impath + '004_tele_start.gif', format='gif -index %i' % (i)) for i in range(1)]
 
 # pyautogui.displayMousePosition()
 
