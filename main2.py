@@ -13,7 +13,8 @@ check = 1
 idle_num = [1, 2, 3, 4, 5, 8]
 walk_left = [ 6, 7]
 walk_right = [9, 10]
-teleport = [11]
+computer = [11, 12, 13, 14, 15]
+teleport = [16]
 event_number = random.randrange(1, 3, 1)
 impath = './Animations/'
 
@@ -24,7 +25,7 @@ def gif_work(cycle, frames, event_number, first_num, last_num):
         cycle += 1
     else:        
         cycle = 0
-        event_number = random.randrange(1, 11, 1)
+        event_number = random.randrange(1, 15, 1)
     return cycle, event_number
 
    
@@ -56,12 +57,15 @@ def update(cycle, check, event_number, x, x_left_edge, x_right_edge):
         frame = walk_right_frames[cycle]
         cycle, event_number = gif_work(cycle, walk_right_frames, event_number, 1, 3)
         x += 50
+    elif check == 3:
+        frame = computer_frames[cycle]
+        cycle, event_number = gif_work(cycle, computer_frames, event_number, 1, 3)
     elif check == 11:
         frame = tele_start_frames[cycle]
         cycle, event_number = gif_work(cycle, tele_start_frames, event_number, 1, 3)
         x += 100
     else:
-        event_number = random.randrange(1, 11, 1)
+        event_number = random.randrange(1, 15, 1)
         print("skipped")
 
     print(x)
@@ -88,6 +92,11 @@ def event(cycle, check, event_number, x, x_left_edge, x_right_edge):
         check = 11
         print('teleport')
         window.after(100, update, cycle, check, event_number, x, x_left_edge, x_right_edge)
+    elif event_number in computer:
+        check = 3
+        print('computer gaming')
+        window.after(2000, update, cycle, check, event_number, x, x_left_edge, x_right_edge)
+
 
 
 window = tk.Tk()
@@ -96,8 +105,8 @@ screen_height = window.winfo_screenheight()
 
 
 # Start Window position
-x_coordinate = (screen_width - window.winfo_reqwidth()) // 2
-y_coordinate = (screen_height - window.winfo_reqheight()) // 2
+x_coordinate = (screen_width - window.winfo_reqwidth()) // 2 
+y_coordinate = (screen_height - window.winfo_reqheight()) // 2 + 100
 window.geometry(f'{window.winfo_reqwidth()}x{window.winfo_reqheight()}+{x_coordinate}+{y_coordinate}')
 print(window.winfo_screenwidth())
 print("starting")
@@ -140,14 +149,14 @@ idle_frames = [tk.PhotoImage(file=impath + '001_idle.gif', format='gif -index %i
 walk_right_frames = [tk.PhotoImage(file=impath + '002_walkright.gif', format='gif -index %i' % (i)) for i in range(1)]
 walk_left_frames = [tk.PhotoImage(file=impath + '003_walkleft.gif', format='gif -index %i' % (i)) for i in range(1)]
 tele_start_frames = [tk.PhotoImage(file=impath + '004_tele_start.gif', format='gif -index %i' % (i)) for i in range(1)]
-
+computer_frames = [tk.PhotoImage(file=impath + '005_computer.gif', format='gif -index %i' % (i)) for i in range(1)]
 # pyautogui.displayMousePosition()
 
 # window configuration
 window.config(highlightbackground='black')
 window.overrideredirect(True)
 window.wm_attributes('-transparentcolor', 'black')
-window.attributes('-topmost', True)
+window.wm_attributes('-topmost', True)
 label = tk.Label(window, bd=0, bg='black')
 label.pack()
 
