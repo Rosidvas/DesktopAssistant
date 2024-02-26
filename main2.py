@@ -21,6 +21,7 @@ impath = './Animations/'
 
 # Loops the gifs
 def gif_work(cycle, frames, event_number, first_num, last_num):
+    print("playing gif")
     if cycle < len(frames) - 1:
         cycle += 1
     else:        
@@ -39,12 +40,14 @@ def update(cycle, check, event_number, x, x_left_edge, x_right_edge):
         #start teleporter animation
         frame = tele_start_frames[cycle]
         cycle, event_number = gif_work(cycle, tele_start_frames, event_number, 1, 3)
-        
+
         x = new_x_after_teleport
         teleport_active = False
         print("The teleport was active!")
+        window.after(1000, update, cycle, check, event_number, x, x_left_edge, x_right_edge)
+        return
 
-    y = (screen_height - window.winfo_reqheight())
+    y = max((screen_height - window.winfo_reqheight()), 0)
 
     if check == 0:
         frame = idle_frames[cycle]
@@ -60,7 +63,7 @@ def update(cycle, check, event_number, x, x_left_edge, x_right_edge):
     elif check == 3:
         frame = computer_frames[cycle]
         cycle, event_number = gif_work(cycle, computer_frames, event_number, 1, 3)
-    elif check == 11:
+    elif check == 500:
         frame = tele_start_frames[cycle]
         cycle, event_number = gif_work(cycle, tele_start_frames, event_number, 1, 3)
         x += 100
@@ -69,7 +72,7 @@ def update(cycle, check, event_number, x, x_left_edge, x_right_edge):
         print("skipped")
 
     print(x)
-    window.geometry(f'+{x}+{y}')
+    window.geometry(f'256x256+{x}+{y-50}')
     label.configure(image=frame)
     window.after(1,event,cycle,check,event_number,x, x_left_edge, x_right_edge)
 
@@ -89,9 +92,9 @@ def event(cycle, check, event_number, x, x_left_edge, x_right_edge):
         print('walking towards right')
         window.after(200, update, cycle, check, event_number, x, x_left_edge, x_right_edge)  # no 8,9 = walk towards right
     elif event_number in teleport:
-        check = 11
+        check = 500
         print('teleport')
-        window.after(100, update, cycle, check, event_number, x, x_left_edge, x_right_edge)
+        window.after(500, update, cycle, check, event_number, x, x_left_edge, x_right_edge)
     elif event_number in computer:
         check = 3
         print('computer gaming')
@@ -106,8 +109,8 @@ screen_height = window.winfo_screenheight()
 
 # Start Window position
 x_coordinate = (screen_width - window.winfo_reqwidth()) // 2 
-y_coordinate = (screen_height - window.winfo_reqheight()) // 2 + 100
-window.geometry(f'{window.winfo_reqwidth()}x{window.winfo_reqheight()}+{x_coordinate}+{y_coordinate}')
+y_coordinate = (screen_height - window.winfo_reqheight()) //2
+window.geometry(f'256x256+{x_coordinate}+{y_coordinate-75}')
 print(window.winfo_screenwidth())
 print("starting")
 
@@ -133,10 +136,8 @@ def onclick_teleport(Event):
     x = window.winfo_x()
     new_x_after_teleport = generate_x_coordinate(window) #x + 200
     teleport_active = True
-
-
     
-    window.geometry(f'+{x}+{(screen_height - window.winfo_reqheight())}')
+    window.geometry(f'+{x}+{(screen_height - window.winfo_reqheight()-50)}')
    
 
 
